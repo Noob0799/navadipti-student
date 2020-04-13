@@ -1,41 +1,37 @@
 import React, { Fragment } from 'react';
 import Navbar from '../../navbar';
+import './homework.css';
 import Axios from 'axios';
 
 class homework extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            minDate: ''
+            data: [],
+            details: 'Homework will be displayed here if available.',
+            date: ''
         };
-        this.getDate = this.getDate.bind(this);
+        this.findHomework = this.findHomework.bind(this);
+        this.resetHomework = this.resetHomework.bind(this);
     }
 
     componentDidMount() {
-        this.getDate();
+        Axios.get("http://localhost:5000/homework/get")
+            .then(res => {
+                console.log(res.data.message, res.data.data);
+                this.setState({
+                    data: res.data.data,
+                    date: 'N/A'
+                });
+            },
+            err => {
+                console.log('Error');
+            })
     }
 
-    getDate() {
-        const tempDate = new Date();
-        let month;
-        if((tempDate.getMonth()+1) > '9') {
-            month = tempDate.getMonth()+1;
-        } else {
-            let n = tempDate.getMonth()+1;
-            month = '0' + n;
-        }
-        const minDate = tempDate.getFullYear() + '-' + month + '-' + tempDate.getDate();
-        console.log(minDate);
-        this.setState({
-            minDate: minDate
-        });
-    }
-
-    addHomework() {
+    findHomework() {
         const hclass = document.getElementById('hclass').value;
         const hsubject = document.getElementById('hsubject').value;
-        const hdate = document.getElementById('hdate').value;
-        const hdetails = document.getElementById('hdetails').value;
         if(hclass === 'Nursery' || hclass === 'KG') {
             if(hsubject !== 'English' && hsubject !== 'Bengali' && hsubject !== 'Mathematics'){
                 console.log('Error');
@@ -60,20 +56,25 @@ class homework extends React.Component {
                 return;
             }
         }
-        if(hclass && hsubject && hdate && hdetails) {
-            const homework = {class: hclass, subject: hsubject, date: hdate, details: hdetails};
-            console.log('Homework', homework);
-            Axios.post("http://localhost:5000/homework/add", {data: homework})
-                .then(res => {
-                    console.log(res.data.message);
-                    document.getElementById('hreset').click();
-                },
-                err => {
-                    console.log('Error');
-                })
+        if(hclass && hsubject) {
+            this.state.data.forEach(obj => {
+                if(obj.class === hclass && obj.subject === hsubject) {
+                    this.setState({
+                        details: obj.details,
+                        date: obj.date
+                    });
+                }
+            });
         } else {
             console.log('Error');
         }
+    }
+
+    resetHomework() {
+        this.setState({
+            details: 'Homework will be displayed here if available.',
+            date: 'N/A'
+        });
     }
 
     render() {
@@ -81,7 +82,7 @@ class homework extends React.Component {
             <Fragment>
                 <Navbar />
                 <div className="jumbotron m-1">
-                    <h5>Add Homework:</h5>
+                    <h5>Find Homework:</h5>
                 </div>
                 <form className="mx-5">
                     <label>Class:</label><br/>
@@ -105,13 +106,14 @@ class homework extends React.Component {
                         <option value="Geograpgy">Geography</option>
                         <option value="Science">Science</option>
                     </select><br/>
-                    <label>To be checked on:</label><br/>
-                    <input type="date" id="hdate" min={this.state.minDate}/><br/>
-                    <label>Homework details:</label><br/>
-                    <textarea id="hdetails" cols="15"/><br/>
                     <div className="d-flex justify-content-center">
-                        <button type="button" className="btn btn-dark m-2" onClick={this.addHomework}>Add</button>
-                        <button type="reset" className="btn btn-dark m-2" id="hreset">Reset</button>
+                        <button type="button" className="btn btn-dark m-2" onClick={this.findHomework}>Search</button>
+                        <button type="reset" className="btn btn-dark m-2" id="hreset" onClick={this.resetHomework}>Reset</button>
+                    </div>
+                    <hr/>
+                    <div className="displayhomework">
+                        <p>To be checked on: {this.state.date}</p>
+                        <p>{this.state.details}</p>
                     </div>
                 </form>
             </Fragment>

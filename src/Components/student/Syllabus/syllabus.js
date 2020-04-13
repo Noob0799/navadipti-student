@@ -1,14 +1,36 @@
 import React, { Fragment } from 'react';
 import Navbar from '../../navbar';
+import './syllabus.css';
 import Axios from 'axios';
 
 class syllabus extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: [],
+            details: 'Syllabus will be displayed here if available.'
+        };
+        this.findSyllabus = this.findSyllabus.bind(this);
+        this.resetSyllabus = this.resetSyllabus.bind(this);
+    }
 
-    addSyllabus() {
+    componentDidMount() {
+        Axios.get("http://localhost:5000/syllabus/get")
+            .then(res => {
+                console.log(res.data.message, res.data.data);
+                this.setState({
+                    data: res.data.data
+                });
+            },
+            err => {
+                console.log('Error');
+            })
+    }
+
+    findSyllabus() {
         const cclass = document.getElementById('cclass').value;
         const ssubject = document.getElementById('ssubject').value;
         const tterm = document.getElementById('tterm').value;
-        const details = document.getElementById('details').value;
         if(cclass === 'Nursery' || cclass === 'KG') {
             if(ssubject !== 'English' && ssubject !== 'Bengali' && ssubject !== 'Mathematics'){
                 console.log('Error');
@@ -33,20 +55,23 @@ class syllabus extends React.Component {
                 return;
             }
         }
-        if(cclass && ssubject && tterm && details) {
-            const syllabus = {class: cclass, subject: ssubject, term: tterm, details: details};
-            console.log('Syllabus', syllabus);
-            Axios.post("http://localhost:5000/syllabus/add", {data: syllabus})
-                .then(res => {
-                    console.log(res.data.message);
-                    document.getElementById('rreset').click();
-                },
-                err => {
-                    console.log('Error');
-                })
+        if(cclass && ssubject && tterm) {
+            this.state.data.forEach(obj => {
+                if(obj.class === cclass && obj.subject === ssubject && obj.term === tterm) {
+                    this.setState({
+                        details: obj.details
+                    });
+                }
+            });
         } else {
             console.log('Error');
         }
+    }
+
+    resetSyllabus() {
+        this.setState({
+            details: 'Syllabus will be displayed here if available.'
+        });
     }
 
     render() {
@@ -54,7 +79,7 @@ class syllabus extends React.Component {
             <Fragment>
                 <Navbar />
                 <div className="jumbotron m-1">
-                    <h5>Add Syllabus:</h5>
+                    <h5>Find Syllabus:</h5>
                 </div>
                 <form className="mx-5">
                     <label>Class:</label><br/>
@@ -87,11 +112,13 @@ class syllabus extends React.Component {
                         <option value="4">4th Test</option>
                         <option value="A">Annual</option>
                     </select><br/>
-                    <label>Syllabus details:</label><br/>
-                    <textarea id="details" cols="15"/><br/>
                     <div className="d-flex justify-content-center">
-                        <button type="button" className="btn btn-dark m-2" onClick={this.addSyllabus}>Add</button>
-                        <button type="reset" className="btn btn-dark m-2" id="rreset">Reset</button>
+                        <button type="button" className="btn btn-dark m-2" onClick={this.findSyllabus}>Search</button>
+                        <button type="reset" className="btn btn-dark m-2" id="rreset" onClick={this.resetSyllabus}>Reset</button>
+                    </div>
+                    <hr/>
+                    <div className="displaysyllabus">
+                        <p>{this.state.details}</p>
                     </div>
                 </form>
             </Fragment>
