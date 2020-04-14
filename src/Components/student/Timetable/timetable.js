@@ -1,13 +1,13 @@
 import React, { Fragment } from 'react';
 import Navbar from '../../navbar';
-import Collapse from 'react-bootstrap/Collapse';
-import './timetable.css';
+import Card from './card';
 import Axios from 'axios';
 
-class timetable extends React.Component {
+class Timetable extends React.Component {
     constructor(props){
         super(props);
         this.state = {
+            token: '',
             data: [],
             open: false
         };
@@ -19,7 +19,8 @@ class timetable extends React.Component {
             .then(res => {
                 console.log(res.data.message, res.data.data);
                 this.setState({
-                    data: res.data.data
+                    data: res.data.data,
+                    token: 'eventrecord'
                 });
             },
             err => {
@@ -31,33 +32,18 @@ class timetable extends React.Component {
         this.setState({
           open: !this.state.open
         });
-      }
+    }
 
     render() {
         return(
             <Fragment>
-                <Navbar />
+                <Navbar token={this.state.token}/>
                 {
                     this.state.data.map(obj => {
                         return (
-                            <ul className="list-group" key={obj._id}>
-                                <li className="btn btn-dark m-2" onClick={this.handleToggle}
-                                aria-controls="example-collapse-text"
-                                aria-expanded={this.state.open}
-                                >
-                                    <label className="datename">Date:{obj.date}</label><br/>
-                                    <label className="datename">Event:{obj.name}</label><br/>
-                                    <label className="datename">Class:{obj.class}</label>
-                                </li>
-                                <Collapse in={this.state.open}>
-                                    <div id="example-collapse-text" className="timetable-container card m-1 p-1" disabled>
-                                        <div className="card-body">
-                                        <label className="card-text">{obj.details}</label>
-                                            <p className="card-title">{obj.time}</p>
-                                        </div>
-                                    </div>
-                                </Collapse>
-                            </ul>
+                            <div key={obj._id}>
+                                <Card obj={obj}/>
+                            </div>
                         );
                     })
                 }
@@ -66,4 +52,4 @@ class timetable extends React.Component {
     }
 }
 
-export default timetable;
+export default Timetable;
