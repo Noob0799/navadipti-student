@@ -52,9 +52,10 @@ export default class ModalComponentReply extends React.Component {
   
     addMessage() {
         const mname = document.getElementById('mnameReply').value;
+        const mclass = document.getElementById('mclassReply').value;
         const mtext = document.getElementById('mtextReply').value;
         if(mname && mtext) {
-            const message = {name: mname, text: mtext, token: 'reply',date: this.state.curDate};
+            const message = {name: mname, class: mclass, text: mtext, token: 'reply',date: this.state.curDate};
             this.state.chat.reply.push(message);
             console.log('Updated chat', this.state.chat);
             Axios.put("/query/update", {data: this.state.chat})
@@ -98,6 +99,16 @@ export default class ModalComponentReply extends React.Component {
                             <form>
                                 <label>Name:</label><br/>
                                 <input type="text" id="mnameReply" size="10"/><br/>
+                                <label>Class:</label><br/>
+                                <select id="mclassReply">
+                                    <option value="Nursery">Nursery</option>
+                                    <option value="KG">KG</option>
+                                    <option value="Transition">Transition</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                </select><br/>
                                 <label>Text:</label><br/>
                                 <textarea id="mtextReply"  cols="15"/><br/>
                                 <div className="d-flex justify-content-center">

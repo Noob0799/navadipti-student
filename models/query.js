@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const querySchema = mongoose.Schema({
     name: {type: String, required: true},
+    class: {type: String, required: false},
     text: {type: String, required: true},
     token: {type: String, required: false},
     id: {type: String, required: false},
