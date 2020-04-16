@@ -45,9 +45,10 @@ export default class ModalComponentNew extends React.Component {
 
     addMessage() {
         const mname = document.getElementById('mnameNew').value;
+        const mclass = document.getElementById('mclassNew').value;
         const mtext = document.getElementById('mtextNew').value;
         if(mname && mtext) {
-            const message = {name: mname, text: mtext, token: 'new', id: '', reply: [], date: this.state.curDate};
+            const message = {name: mname, class: mclass, text: mtext, token: 'new', id: '', reply: [], date: this.state.curDate};
             console.log('Message', message);
             Axios.post("/query/add", {data: message})
                 .then((res) => {
@@ -90,6 +91,16 @@ export default class ModalComponentNew extends React.Component {
                             <form>
                                 <label>Name:</label><br/>
                                 <input type="text" id="mnameNew"/><br/>
+                                <label>Class:</label><br/>
+                                <select id="mclassNew">
+                                    <option value="Nursery">Nursery</option>
+                                    <option value="KG">KG</option>
+                                    <option value="Transition">Transition</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                </select><br/>
                                 <label>Text:</label><br/>
                                 <textarea id="mtextNew"/><br/>
                                 <div className="d-flex justify-content-center">
