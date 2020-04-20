@@ -9,7 +9,6 @@ class homework extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            data: [],
             details: []
         };
         this.findHomework = this.findHomework.bind(this);
@@ -17,21 +16,7 @@ class homework extends React.Component {
     }
 
     componentDidMount() {
-        Axios.get("/homework/get")
-            .then(res => {
-                console.log(res.data.message, res.data.data);
-                this.setState({
-                    data: res.data.data,
-                    date: 'N/A'
-                });
-                this.notifyA('Homeworks fetched successfully');
-                document.getElementById('hclass').disabled = false;
-                document.getElementById('hsubject').disabled = false;
-            },
-            err => {
-                console.log('Error');
-                this.notifyB('Try again later');
-            })
+        
     }
 
     findHomework() {
@@ -72,18 +57,24 @@ class homework extends React.Component {
         if(hclass && hsubject) {
             console.log(hclass, hsubject);
             let tempdetails = [];
-            this.state.data.forEach(obj => {
-                if(obj.class === hclass && obj.subject === hsubject) {
-                    const tempobj = {id: obj._id, body: obj.details, date: obj.date, img: obj.img, class: obj.class, subject: obj.subject};
-                    tempdetails.push(tempobj);
-                }
-            });
-            if(tempdetails.length === 0) {
-                this.notifyB('Not available');
-            }
-            this.setState({
-                details: tempdetails,
-            });
+            Axios.get("/homework/get/" + hclass + "&" + hsubject)
+            .then(res => {
+                console.log(res.data.message);
+                this.notifyA(res.data.message);
+                console.log(res.data.data);
+                res.data.data.forEach(element => {
+                    const obj = {img: element.img, details: element.details, date: element.date, id: element._id};
+                    tempdetails.push(obj);
+                });
+                this.setState({
+                    details: tempdetails
+                });
+            },
+            err => {
+                console.log('Error');
+                this.notifyB('Try again later');
+                this.resetHomework();
+            })
         } else {
             console.log('Error');
             this.notifyB('Error');
@@ -111,7 +102,7 @@ class homework extends React.Component {
                 </div>
                 <form className="mx-5">
                     <label>Class:</label><br/>
-                    <select id="hclass" disabled>
+                    <select id="hclass">
                         <option value="Nursery">Nursery</option>
                         <option value="KG">KG</option>
                         <option value="Transition">Transition</option>
@@ -121,7 +112,7 @@ class homework extends React.Component {
                         <option value="4">4</option>
                     </select><br/>
                     <label>Subject:</label><br/>
-                    <select id="hsubject" disabled>
+                    <select id="hsubject">
                         <option value="English">English</option>
                         <option value="Bengali">Bengali</option>
                         <option value="Mathematics">Mathematics</option>
@@ -149,7 +140,7 @@ class homework extends React.Component {
                                                 <p><a download={"hw" + obj.class + obj.subject} href={obj.img}>Download</a></p>
                                             </div>
                                         }
-                                        <p>{obj.body}</p>
+                                        <p>{obj.details}</p>
                                     </div>
                                 );
                             })
